@@ -1,21 +1,21 @@
 {
-  "name": "agx",
+  "name": "foo",
   "version": "1.0.0",
-  "description": "STEEM/SBD 200 days Moving Average calculator",
-  "main": "index.js",
-  "dependencies": {
-    "request": "^2.83.0"
-  },
-  "devDependencies": {},
+  "private": true,
   "scripts": {
-    "start": "node index.js"
+    "start": "node ./bin/www"
   },
-  "keywords": [
-    "agx",
-    "mayer",
-    "moving",
-    "average"
-  ],
-  "author": "stoodkev",
-  "license": "ISC"
+  "dependencies": {
+    "anychart-nodejs": "^1.3.8",
+    "body-parser": "~1.18.2",
+    "cookie-parser": "~1.4.3",
+    "debug": "~2.6.9",
+    "express": "~4.15.5",
+    "fs": "0.0.1-security",
+    "jade": "~1.11.0",
+    "jsdom": "^11.6.2",
+    "morgan": "~1.9.0",
+    "request": "^2.83.0",
+    "serve-favicon": "~2.4.5"
+  }
 }
