@@ -13,6 +13,8 @@ A 200 day moving average for the price of steem/sbd
 `npm install`
 `npm start`
 
+Access the www server with `http://localhost:3000`
+
 # To do
 
-* Explain how to set the author
+* Explain how to set the author variable
