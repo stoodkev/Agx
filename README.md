@@ -8,6 +8,13 @@ A 200 day moving average for the price of steem/sbd
 
 # Getting Started
 
+Set your environment variables with your steem userid and your posting Wif key:
+
+`export AUTHOR=aggroed`
+`export WIF=5---------------------M`
+
+Get the code and start the web server:
+
 `git clone git@github.com:aggroed/Agx.git`
 `cd Agx`
 `npm install`
@@ -17,4 +24,4 @@ Access the www server with `http://localhost:3000`
 
 # To do
 
-* Explain how to set the author variable
+* Write mocha tests
