@@ -186,7 +186,7 @@ function startAgX(res,date){
     body+='AgX aims to be a similar indicator regarding the STEEM/SBD ratio, in order for users to find the right moment to exchange their SBD for STEEM at the best possible rate.';
     body+='<hr/>Original idea by @aggroed (<a href="https://v2.steemconnect.com/sign/account-witness-vote?witness=aggroed&amp;approve=1">Vote for witness</a>)';
     body+='<br/>Developed by @stoodkev (<a href="https://v2.steemconnect.com/sign/account-witness-vote?witness=stoodkev&amp;approve=1">Vote for witness</a>)<hr/>'
-    var jsonmetadata= {"tags":["AgX","steem","cryptocurrency","news","minnowsupportproject"],"users":["stoodkev","aggroed"],"image":[process.env.URL+'/public/'+date+'.jpg'],"links":["https://v2.steemconnect.com/sign/account-witness-vote?witness=stoodkev&amp;approve=1","https://v2.steemconnect.com/sign/account-witness-vote?witness=aggroed&amp;approve=1"],"app":"AgX/1","format":"markdown"};
+    var jsonmetadata= {"tags":["AgX","steem","cryptocurrency","news","minnowsupportproject"],"users":["stoodkev","aggroed"],"image":[process.env.URL+'/'+date+'.jpg'],"links":["https://v2.steemconnect.com/sign/account-witness-vote?witness=stoodkev&amp;approve=1","https://v2.steemconnect.com/sign/account-witness-vote?witness=aggroed&amp;approve=1"],"app":"AgX/1","format":"markdown"};
 
     var operations = [
             ['comment',
