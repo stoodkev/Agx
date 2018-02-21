@@ -49,15 +49,13 @@ function startAgX(res,date){
           else
             {
               const SBD=json.result.splice(json.result.length-400);
-              //console.log('GOT SBD',SBD);
               const STEEM_SBD=getSteemSbd(STEEM,SBD);
-              //console.log(STEEM_SBD,STEEM_SBD[STEEM_SBD.length-1]);
-              const MAYER=getMayer(STEEM_SBD);
-              //console.log('MAYER: ',MAYER,MAYER[199],MAYER.length);
+              const MAD=getMAD(STEEM_SBD);
+              const AgX=getAgX(STEEM_SBD,MAD);
               const time= SBD.map(function(e){return new Date(e.T).getTime();});
-              //console.log(time);
-              const chart=createChart(time,STEEM_SBD,MAYER);
-              saveChart(chart,{price:STEEM_SBD[399],agx:MAYER[199]});
+              const chartPriceMad=createChart(time,STEEM_SBD,MAD);
+              const chartAgX=createChartAgX(time,AgX);
+              saveCharts(chartPriceMad,chartAgX,{price:STEEM_SBD[399],mad:MAD[199],agx:AgX[199]});
             }
         });
       }
@@ -73,20 +71,26 @@ function startAgX(res,date){
     return steem_sbd;
   }
 
-  function getMayer(array){
-    console.log('Calculating AgX');
-    var mayers=[];
+
+  function getMAD(array){
+    console.log('Calculating MAD');
+    var mad=[];
     for(var i=0;i<200;i++){
-     mayers.push(array.slice(i,i+200).reduce((previous, current) => current += previous)/200);
+     mad.push(array.slice(i,i+200).reduce((previous, current) => current += previous)/200);
    }
-   return mayers;
+   return mad;
   }
 
-  function createChart(time,price,mayer)
+  function getAgX(price,mad)
+  {
+    return mad.map(function(n, i) { return price[i+200] / n; });
+  }
+
+  function createChart(time,price,mad)
   {
     console.log('Drawing chart!');
     var chart = anychart.line();
-    chart.title("STEEM/SBD price and AgX");
+    chart.title("STEEM/SBD price and 200 days Moving Average");
     var yAxis = chart.yAxis();
     yAxis.orientation("right");
     yAxis.title("STEEM/SBD");
@@ -101,7 +105,7 @@ function startAgX(res,date){
     // apply Date Time scale
     chart.xScale(dateTimeScale);
     var price_series=[];
-    var mayer_series=[];
+    var mad_series=[];
     var label = chart.label();
     label.padding(10,0);
     label.position("topright");
@@ -110,7 +114,77 @@ function startAgX(res,date){
     label.offsetX(25);
     label.width(200);
     label.hAlign("center");
-    label.text("STEEM/SBD : "+Math.round(price[399]*100)/100+"\n AgX : "+Math.round(mayer[199]*100)/100);
+    label.text("STEEM/SBD : "+Math.round(price[399]*100)/100+"\n 200d MAD : "+Math.round(mad[199]*100)/100);
+    var labelBackground = label.background();
+    labelBackground.enabled(true);
+    labelBackground.fill(null);
+    labelBackground.stroke("2 #3498db");
+    chart.bounds(10, 10, 800, 600);
+    chart.xGrid().enabled(true);
+    chart.yGrid().enabled(true);
+    // enable minor grids
+    chart.xMinorGrid().enabled(true);
+    chart.yMinorGrid().enabled(true);
+    for (var i=0;i<time.length-1;i++){
+      price_series.push({value:price[i],x:time[i]});
+      if(i>=200)
+        {
+        mad_series.push({value:mad[i-200],x:time[i]});
+      }
+    }
+    var pr = chart.line(price_series.splice(price_series.length-365));
+    var ma = chart.line(mad_series);
+    pr.normal().stroke("#3498db",2);
+    pr.name('STEEM/SBD');
+    ma.normal().stroke("#b22000",2);
+    ma.name('200d MAD');
+    chart.legend(true);
+    var labels = chart.xAxis().labels();
+    labels.hAlign("center");
+    labels.width(60);
+    labels.format(function(value){
+      var date = new Date(value["tickValue"]);
+      var options = {
+        year: "numeric",
+        month: "short"
+      };
+      return date.toLocaleDateString("en-US", options);
+    });
+    // set container and draw chart
+    chart.container("container");
+    chart.draw();
+
+    return chart;
+  }
+
+  function createChartAgX(time,agx)
+  {
+    console.log('Drawing chart AgX!');
+    var chart = anychart.line();
+    chart.title("AgX");
+    var yAxis = chart.yAxis();
+    yAxis.orientation("right");
+    yAxis.title("STEEM/SBD");
+    var xAxis = chart.xAxis();
+    xAxis.title("Time");
+
+    var dateTimeScale = anychart.scales.dateTime();
+    var dateTimeTicks = dateTimeScale.ticks();
+    dateTimeTicks.interval(0,1);
+    var minorTicks = dateTimeScale.minorTicks();
+
+    // apply Date Time scale
+    chart.xScale(dateTimeScale);
+    var agx_series=[];
+    var label = chart.label();
+    label.padding(10,0);
+    label.position("topright");
+    label.anchor("topright");
+    label.offsetY(15);
+    label.offsetX(25);
+    label.width(200);
+    label.hAlign("center");
+    label.text("AgX : "+Math.round(agx[199]*100)/100);
     var labelBackground = label.background();
     labelBackground.enabled(true);
     labelBackground.fill(null);
@@ -124,16 +198,14 @@ function startAgX(res,date){
     chart.xMinorGrid().enabled(true);
     chart.yMinorGrid().enabled(true);
     for (var i=0;i<time.length-1;i++){
-      price_series.push({value:price[i],x:time[i]});
       if(i>=200)
-        mayer_series.push({value:mayer[i-200],x:time[i]});
+        {
+        agx_series.push({value:agx[i-200],x:time[i]});
+      }
     }
-    var pr = chart.line(price_series.splice(price_series.length-365));
-    var ma = chart.line(mayer_series);
-    pr.normal().stroke("#3498db",2);
-    pr.name('STEEM/SBD');
-    ma.normal().stroke("#b22000",2);
-    ma.name('AgX');
+    var ag = chart.line(agx_series);
+    ag.normal().stroke("#3317b4",2);
+    ag.name('AgX');
 
     chart.legend(true);
 
@@ -148,7 +220,6 @@ function startAgX(res,date){
       };
       return date.toLocaleDateString("en-US", options);
     });
-
     // set container and draw chart
     chart.container("container");
     chart.draw();
@@ -156,31 +227,46 @@ function startAgX(res,date){
     return chart;
   }
 
-  function saveChart(chart,price){
-    anychartExport.exportTo(chart, 'jpg').then(function(image) {
+  function saveCharts(chartA,chartB,price){
+    anychartExport.exportTo(chartA, 'jpg').then(function(image) {
 
-      fs.writeFile('./public/'+date+'.jpg', image, function(fsWriteError) {
+      fs.writeFile('./public/A'+date+'.jpg', image, function(fsWriteError) {
         if (fsWriteError) {
           console.log(fsWriteError);
-          return null;
+          return false;
         } else {
-          console.log('Chart has been generated!');
-          PostChart(date,price);
-           res.render('./index', {});
-          return date;
+          console.log('Chart A has been generated!');
+          anychartExport.exportTo(chartB, 'jpg').then(function(im) {
+
+            fs.writeFile('./public/B'+date+'.jpg', im, function(fsWriteErrors) {
+              if (fsWriteErrors) {
+                console.log(fsWriteErrors);
+                return false;
+              } else {
+                console.log('Chart B has been generated!');
+                PostChart(date,price);
+                return true;
+              }
+            });
+          }, function(generationErrors) {
+            console.log(generationErrors);
+            return false;
+          });
         }
       });
     }, function(generationError) {
       console.log(generationError);
-      return null;
+      return false;
     });
   }
 
   function PostChart(date,price)
   {
-    var body=process.env.URL+'/'+date+'.jpg';
+    console.log('Posting chart!');
+    var body=process.env.URL+'/A'+date+'.jpg';
     body+='<br/><br/>';
-    body+='This is the daily AgX chart for today '+date+'.<br/>Today\'s AgX factor is '+Math.round(price.agx*100)/100+' for a STEEM/SBD ratio of '+Math.round(100*price.price)/100+'.';
+    body+='This is the chart for today '+date+'.<br/>Today\'s 200 days moving average factor is '+Math.round(price.mad*100)/100+' for a STEEM/SBD ratio of '+Math.round(100*price.price)/100+'.<br/>The AgX is factor is'+Math.round(100*price.agx)/100+'.';
+    body+='<br/><br/>'+process.env.URL+'/B'+date+'.jpg <br/><br/>';
     body+='<h3>What is AgX?</h3><br/><br/>';
     body+='The Mayer\'s multiple (200 days moving average of the BTC/USD price) is known to be a good indicator of the BTC price evolution.\n';
     body+='AgX aims to be a similar indicator regarding the STEEM/SBD ratio, in order for users to find the right moment to exchange their SBD for STEEM at the best possible rate.';
@@ -217,7 +303,7 @@ function startAgX(res,date){
                 ]
             }]
         ];
-        console.log(operations);
+        //console.log(operations);
         steem.broadcast.send({
           operations: operations, extensions: [] },
           { posting: process.env.WIF },
