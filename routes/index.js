@@ -188,7 +188,7 @@ function startAgX(res,date){
     var labelBackground = label.background();
     labelBackground.enabled(true);
     labelBackground.fill(null);
-    labelBackground.stroke("2 #3498db");
+    labelBackground.stroke("2 #3317b4");
 
     chart.bounds(10, 10, 800, 600);
 
