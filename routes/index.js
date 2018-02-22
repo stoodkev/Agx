@@ -267,7 +267,8 @@ function startAgX(res,date){
     body+='<br/><br/>';
     body+='This is the chart for today '+date+'.<br/>Today\'s 200 days moving average factor is '+Math.round(price.mad*100)/100+' for a STEEM/SBD ratio of '+Math.round(100*price.price)/100+'.<br/>The AgX is factor is'+Math.round(100*price.agx)/100+'.';
     body+='<br/><br/>'+process.env.URL+'/B'+date+'.jpg <br/><br/>';
-    body+='<h3>What is AgX?</h3><br/><br/>';
+    body+='You can use the chart below to provide some historic suggestions of what\'s been good previously.  If the blue line is in the top third of the chart it\'s a good time to sell Steem.  If it\'s in the bottom it\'s a good time to sell SBD.  Past performance isn\'t a guarantee of current valuations or trends.';
+    body+='<br/><h3>What is AgX?</h3><br/><br/>';
     body+='The Mayer\'s multiple (200 days moving average of the BTC/USD price) is known to be a good indicator of the BTC price evolution.\n';
     body+='AgX aims to be a similar indicator regarding the STEEM/SBD ratio, in order for users to find the right moment to exchange their SBD for STEEM at the best possible rate.';
     body+='<hr/>Original idea by @aggroed (<a href="https://v2.steemconnect.com/sign/account-witness-vote?witness=aggroed&amp;approve=1">Vote for witness</a>)';
